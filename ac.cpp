@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include <cstdlib>
+#include <ctime>
 using namespace std;
 
 // hacer un creador de automatas celular
@@ -18,102 +19,123 @@ using namespace std;
 ################################################################################
 */
 
-// creación de un automata celular en base a caracteristicas anteriores
-class automata_celular
+// variables globales
+int tiempo_de_infeccion;
+// posibilidad de contagiarte por vecino
+float tasa_transmisibilidad;
+// tiempo que dura la inmunidad una vez recuperado
+int tiempo_de_inmunidad;
+// estados
+vector<string> estados = {"S", "I", "R"};
+
+class celula
 {
 public:
-    int infectados, suceptibles, recuperados, poblacion;
-    bool confinamiento; 
+    // cero significa que no existe el ciclo para este estado, partiendo del 1 se entiende como el t(1) del estado actual.
+    int ciclo;
+    // los estados pueden ser (S)suceptible, (I)infectado, (R)recuperado.
+    string estado;
 
-    // constructor
-    automata_celular(int inf, int suc, int rec, bool conf)
+    celula(int cic, string est)
     {
-            confinamiento = conf; 
-            infectados = inf;
-            suceptibles = suc;
-            recuperados = rec;
-            poblacion = infectados + suceptibles + recuperados;
+        ciclo = cic;
+        estado = est;
     }
 
-    // alguien se infecta
-    string infectar(int num_infectados)
+    celula()
     {
-        if (suceptibles < num_infectados)
+        ciclo = 0;
+        estado = "S";
+    }
+
+    void celula_aleatoria()
+    {
+        estado = estados[rand() % 3];
+        if (estado != "S")
         {
-            return "no se puede infectar a más que aquellos suceptibles";
+            if (estado == "I")
+            {
+                ciclo = rand() % tiempo_de_infeccion + 1;
+            }
+            else if (estado == "R")
+            {
+                ciclo = rand() % tiempo_de_inmunidad + 1;
+            }
         }
         else
         {
-            suceptibles = suceptibles - num_infectados;
-            infectados = infectados + num_infectados;
-            return "se han infectado las personas exitosamente";
+            ciclo = 0;
         }
-    }
-
-    string verificar_recuperados(int num_recuperados)
-    {
-        if (infectados < num_recuperados)
-        {
-            return "no se pueden recuperar más que aquellos infectados";
-        }
-        else
-        {
-            infectados = infectados - num_recuperados;
-            recuperados = recuperados + num_recuperados;
-            return "la gente se ha recuperado con exito";
-        }
-    }
-
-    string random_automata(int max_population, int min_population)
-    {
-        confinamiento = rand() % 2 ; 
-        infectados = rand() % max_population + min_population; 
-        suceptibles = rand() % max_population + min_population; 
-        recuperados = rand() % max_population + min_population; 
-        poblacion = infectados + suceptibles + recuperados; 
-        return "hemos creado este automata con valores al azar";
     }
 };
-
-// clase con el grid
 
 class automata_grid
 {
 public:
     int x, y;
-    vector<vector<automata_celular>> grid;
-    vector<automata_celular> fila; 
+    vector<vector<celula>> grid;
+    vector<celula> fila;
 
-    automata_grid(int x, int y){
-        for(int i=0; i<x; i++){
-            for(int j=0; j<y; j++){
-                automata_celular automata(0,0,0,0);
+    // esto hay que llamarlo al toque.
+    automata_grid(int m, int n)
+    {
+        x = m;
+        y = n;
+        for (int i = 0; i < x; i++)
+        {
+            for (int j = 0; j < y; j++)
+            {
+                celula automata(0, "S");
                 fila.push_back(automata);
             }
-            grid.push_back(fila); 
+            grid.push_back(fila);
             fila.clear();
         }
     }
 
-    string insertar_automata(automata_celular automata, int x_pos, int y_pos){
-        grid[x][y] = automata; 
-        return "se ha insertado la celula con exito";
+    void celulas_aleatorias()
+    {
+        for (int i = 0; i < x; i++)
+        {
+            for (int j = 0; j < y; j++)
+            {
+                grid[i][j].celula_aleatoria();
+            }
+        }
     }
 
-    string eliminar_automata(int x_pos, int y_pos){
-        automata_celular automata(0,0,0,0);
-        grid[x][y] = automata; 
+    void imprimir_estados()
+    {
+        for (int i = 0; i < x; i++)
+        {
+            for (int j = 0; j < y; j++)
+            {
+                cout << grid[i][j].estado << grid[i][j].ciclo << " ";
+            }
+            cout << endl;
+        }
+    }
+
+    string insertar_automata(celula automata, int x_pos, int y_pos)
+    {
+        grid[x][y] = automata;
+        return "se ha insertado la celula con exito";
     }
 };
 
 
-
-
 main(int argc, char const *argv[])
 {
-    vector<automata_grid> timeline; 
-    automata_celular automata(0,0,0,0); 
+    // semilla
+    srand(time(0));
+    tiempo_de_infeccion = 5;
+    tiempo_de_inmunidad = 5;
+    tasa_transmisibilidad = 0.3;
+    automata_grid grid(5, 5);
+    grid.celulas_aleatorias();
+    grid.imprimir_estados();
 
     /* code */
     return 0;
 }
+
