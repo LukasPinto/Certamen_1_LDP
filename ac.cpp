@@ -50,7 +50,7 @@ public:
         }
     }
 
-    string recuperados(int num_recuperados)
+    string verificar_recuperados(int num_recuperados)
     {
         if (infectados < num_recuperados)
         {
