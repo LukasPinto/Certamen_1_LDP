@@ -72,7 +72,7 @@ public:
         double rand_val = (double)rand() / RAND_MAX;
         if ( rand_val <= tasa_transmisibilidad )
         {
-            cout << rand_val << "<=" << tasa_transmisibilidad<<endl;
+            //cout << rand_val << "<=" << tasa_transmisibilidad<<endl;
 
             estado = "I";
             ciclo = 1;
@@ -86,7 +86,6 @@ class automata_grid
 public:
     int x, y;
     vector<vector<celula>> grid;
-    vector<vector<celula>> nueva_grid;
     vector<celula> fila;
 
     // esto hay que llamarlo al toque.
@@ -123,106 +122,85 @@ public:
         {
             for (int j = 0; j < y; j++)
             {
-                cout << grid[i][j].estado << grid[i][j].ciclo << " ";
+                if( grid[i][j].estado == "I"){
+                  cout <<"\e[0;33m" <<grid[i][j].estado << grid[i][j].ciclo <<"\e[0m ";
+                }
+                else if ( grid[i][j].estado == "R"){
+                  cout <<"\e[0;36m" <<grid[i][j].estado << grid[i][j].ciclo <<"\e[0m ";
+                }
+                else if( grid[i][j].estado == "S"){
+                  cout <<"\e[0;32m" <<grid[i][j].estado << grid[i][j].ciclo <<"\e[0m ";
+                }
             }
             cout << endl;
         }
     }
 
 
-     void actualizar_grid(){
-        for (int i = 0; i < x; i++)
-        {
-            for (int j = 0; j < y; j++)
-            {
-                grid[i][j] = nueva_grid[i][j];
-            }
-           
-        }
-    }
 
-    void infectar_celulas()
+void infectar_celulas()
     {
+      vector<vector<celula>> nueva_grid;//nueva grilla
+      nueva_grid = grid;
       for(int i = 0;i < x;i++)
       {
         for ( int j =0;j<y;j++)
-        {  
-
-          /*
-           [y-1,x-1][y-1,x][y-1,x+1]
-           [y,x-1]  [y,x]  [y,x+1]
-           [y+1,x-1][y+1,x][y+1,x+1]*/
-          
-          if(grid[i][j].estado == "I" && grid[i][j].ciclo+1<=tiempo_de_infeccion)
+        {            
+          if(grid[i][j].estado == "I" )
           //en base a una posicion infectada infecto las que estan al rededor
           {
-            if(grid[(unsigned int)(i - 1)%x][(unsigned int)(j - 1)%y].estado == "S"){
+            if(nueva_grid[(unsigned int)(i - 1)%x][(unsigned int)(j - 1)%y].estado == "S"){
                 nueva_grid[(unsigned int)(i - 1)%x][(unsigned int)(j - 1)%y].infectar();
-            }else if(grid[(unsigned int)(i)%x][(unsigned int)(j - 1)%y].estado == "S"){
+            }if(nueva_grid[(unsigned int)(i)%x][(unsigned int)(j - 1)%y].estado == "S"){
                 nueva_grid[(unsigned int)(i)%x][(unsigned int)(j - 1)%y].infectar();
             }
-            else if(grid[(unsigned int)(i + 1)%x][(unsigned int)(j - 1)%y].estado == "S"){
+            if(nueva_grid[(unsigned int)(i + 1)%x][(unsigned int)(j - 1)%y].estado == "S"){
                 nueva_grid[(unsigned int)(i + 1)%x][(unsigned int)(j - 1)%y].infectar();
             }
-            else if(grid[(unsigned int)(i - 1)%x][(unsigned int)(j)%y].estado == "S"){
+            if(nueva_grid[(unsigned int)(i - 1)%x][(unsigned int)(j)%y].estado == "S"){
                 nueva_grid[(unsigned int)(i - 1)%x][(unsigned int)(j)%y].infectar();
             }
-            else if(grid[(unsigned int)(i + 1)%x][(unsigned int)(j)%y].estado == "S"){
+            if(nueva_grid[(unsigned int)(i + 1)%x][(unsigned int)(j)%y].estado == "S"){
                 nueva_grid[(unsigned int)(i + 1)%x][(unsigned int)(j)%y].infectar();
             }
-            else if(grid[(unsigned int)(i - 1)%x][(unsigned int)(j + 1)%y].estado == "S"){
+            if(nueva_grid[(unsigned int)(i - 1)%x][(unsigned int)(j + 1)%y].estado == "S"){
                 nueva_grid[(unsigned int)(i - 1)%x][(unsigned int)(j + 1)%y].infectar();
             }  
-            else if(grid[(unsigned int)(i)%x][(unsigned int)(j + 1)%y].estado == "S"){
+            if(nueva_grid[(unsigned int)(i)%x][(unsigned int)(j + 1)%y].estado == "S"){
                 nueva_grid[(unsigned int)(i)%x][(unsigned int)(j + 1)%y].infectar();
             }
-            else if(grid[(unsigned int)(i + 1)%x][(unsigned int)(j + 1)%y].estado == "S"){
+            if(nueva_grid[(unsigned int)(i + 1)%x][(unsigned int)(j + 1)%y].estado == "S"){
                 nueva_grid[(unsigned int)(i + 1)%x][(unsigned int)(j + 1)%y].infectar();
             }
-            nueva_grid[i][j].ciclo = grid[i][j].ciclo+1;
+            
           }
-          else if (grid[i][j].ciclo+1>tiempo_de_infeccion && grid[i][j].estado == "I"){
-            nueva_grid[i][j].estado = "R";
-            nueva_grid[i][j].ciclo = 1;
-          }
-          else if (grid[i][j].estado == "R"){
-            if (grid[i][j].ciclo +1 > tiempo_de_inmunidad){
-                nueva_grid[i][j].estado = "S";
-                nueva_grid[i][j].ciclo = 0;
             }
-            else{
-              nueva_grid[i][j].ciclo = grid[i][j].ciclo+1;
-            }
-          }
-          else{
-             nueva_grid[i][j] = grid[i][j];
-          }
-        /*else if(grid[i][j].estado == "S"){
-            nueva_grid[i][j] = grid[i][j];
-        }*/
         }
-      }
-
-    actualizar_grid();
-    }
-
-    void crear_new_grid(){
-        //crear una grilla auxiliar vacia
-        fila.clear();
-        for (int i = 0; i < x; i++)
-        {
-            for (int j = 0; j < y; j++)
-            {
-                
-                fila.push_back(grid[i][j]);
+        //revision de ciclos para modifcar en nueva grilla.   
+        for(int i = 0;i < x;i++){
+            for ( int j =0;j<y;j++){
+                if(grid[i][j].estado == "I"){
+                    if (grid[i][j].ciclo +1 > tiempo_de_infeccion){
+                        nueva_grid[i][j].estado = "R";
+                        nueva_grid[i][j].ciclo = 1;
+                    }
+                    else{
+                        nueva_grid[i][j].ciclo = grid[i][j].ciclo+1;
+                    }
+                }
+                else if (grid[i][j].estado == "R"){
+                    if (grid[i][j].ciclo +1 > tiempo_de_inmunidad){
+                        nueva_grid[i][j].estado = "S";
+                        nueva_grid[i][j].ciclo = 0;
+                    }
+                    else{
+                    nueva_grid[i][j].ciclo = grid[i][j].ciclo+1;
+                    }   
+                }
             }
-            nueva_grid.push_back(fila);
-            fila.clear();
         }
+    grid = nueva_grid;
     }
-
-
-  
 
 
 };
@@ -235,10 +213,9 @@ int main(int argc, char const *argv[])
     tiempo_de_infeccion = 3;
     tiempo_de_inmunidad = 3;
     tasa_transmisibilidad = 1;
-    automata_grid grid(5, 5);
+    automata_grid grid(10, 10);
     grid.celulas_aleatorias();
     grid.imprimir_estados();
-    grid.crear_new_grid();
     cout<<endl;
     grid.infectar_celulas();
     grid.imprimir_estados();
