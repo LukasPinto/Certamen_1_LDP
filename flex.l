@@ -13,20 +13,16 @@
 
 
 %%
-"inicial" { return INICIAL;}
-"final" { return FINAL;}
-"leer" { return LEER;}
-"estados" { return ESTADOS;}
-"mostrar_tran" { return MOSTRAR_TRAN;}
-"mostrar_act" { return MOSTRAR_ACT;}
-"mostrar_est" { return MOSTRAR_EST;}
-"mostrar_alf" { return MOSTRAR_ALF;}
-\= { return IGUAL;}
-"alfabeto" { yylval.sval = strdup(yytext);return ALFABETO;}
-"tran" { yylval.sval = strdup(yytext);return TRAN ;}
-"{" { return AP; }
-(,*[A-Za-z0-9]+)+ { yylval.sval = strdup(yytext);return CONT_INPUT;}
-(,*\([A-Za-z]+[0-9]*\,[A-Za-z]+\,[A-Za-z]+[0-9]*\))+ { yylval.sval = strdup(yytext);return CONT_TRAN; }
+"tiempo_infeccion" { return TIEMPO_INFECCION;}
+"tiempo_inmunidad" { return TIEMPO_INMUNIDAD;}
+"dimension" { return DIMENSION;}
+"trasabilidad" { return TRASABILIDAD;}
+"simular" { return SIMULAR;}
+"iniciar" { return INICIAR;}
+[0-9]+ { yylval.intval = atoi(yytext); return INT_NUM;}
+[[:digit:]]+\.[[:digit:]]+ { yylval.sval = strdup(yytext);return PORC_TRASABILIDAD;}
+"," { return COMA;}
+"{" { return AP;}
 "}" { return CP; }
 \n	{ return FINLINEA; }
 
