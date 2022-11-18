@@ -236,7 +236,7 @@ extern automata_grid aux_automata(10,10); //se define una variable auxiliar para
 /* declaramos los tokens */
 //%token NUMERO
 //%token SUMA RESTA MULTIPLICA DIVIDE ABS
-%token AP CP FINLINEA FINLINEA TIEMPO_INFECCION TIEMPO_INMUNIDAD DIMENSION COMA TRASABILIDAD SIMULAR INICIAR
+%token AP CP FINLINEA TIEMPO_INFECCION TIEMPO_INMUNIDAD DIMENSION COMA TRASABILIDAD SIMULAR INICIAR
 %token <intval> INT_NUM
 %token <sval> PORC_TRASABILIDAD
 %%
@@ -262,7 +262,7 @@ tiempo_inmunidad  : INT_NUM { tiempo_de_inmunidad = $1;}
                   ;
 tiempo_infeccion : INT_NUM { tiempo_de_infeccion = $1;}
                  ;
-dimension : INT_NUM COMA INT_NUM { n=$1;m=$3}
+dimension : INT_NUM COMA INT_NUM { n=$1;m=$3;}
           ;
 trasabilidad  : PORC_TRASABILIDAD { aux = stod($1);tasa_transmisibilidad = aux; }
               ;
